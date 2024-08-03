@@ -4,14 +4,15 @@ const MovieSchema = Joi.object({
 	id: Joi.number().integer().greater(0),
 	name: Joi.string().min(3).max(30).required(),
 	genres: Joi.array().items(Joi.string().min(3)).required(),
-	rating: Joi.number().less(10).not().negative().required(),
+	rating: Joi.number().less(10).min(0).required(),
 });
 
 module.exports = {
 	validateId: function (req, res, next) {
 		const { error, value } = Joi.number()
 			.integer()
-			.greater(0)
+			.integer()
+			.greater(-1)
 			.validate(req.params.id);
 
 		if (error) {
@@ -26,6 +27,7 @@ module.exports = {
 	validateMovie: function (req, res, next) {
 		const { error, value } = MovieSchema.validate(req.body);
 		if (error) {
+			console.log(error.message);
 			return res.json({ status: false, msg: "Dados incompletos" });
 		}
 		req.body = value;

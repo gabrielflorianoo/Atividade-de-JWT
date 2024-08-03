@@ -6,13 +6,15 @@ module.exports = {
     new(name, genres, rating) {
         let movie = {id: ids++, name: name, genres: genres, rating: rating};
         movies.push(movie);
-        return task;
+        return movie;
     },
     // Update a movie
-    update (id, name) {
+    update (id, name, genres, rating) {
         let pos = this.getPositionById(id)
         if (pos >= 0) {
             movies[pos].name = name;
+            movies[pos].genres = genres;
+            movies[pos].rating = rating;
             return movies[pos];
         }
         return null;

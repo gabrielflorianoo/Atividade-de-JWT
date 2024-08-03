@@ -1,13 +1,15 @@
 var express = require("express");
 var jwt = require("jsonwebtoken");
-var Movie = require("../model/Movies");
+var Movie = require("../models/Movies");
 var MovieValidator = require("../validators/MovieValidator");
 var router = express.Router();
 
 router.get("/", function (req, res, next) {
 	if (Movie.list().length == 0) {
-		Movie.new("Tarefa 1");
-		Movie.new("Tarefa 2");
+		res.json({
+			status: true,
+			message: "Ainda não foram adicionados filmes a lista",
+		});
 	}
 
 	res.json({ status: true, list: Movie.list() });
@@ -16,7 +18,7 @@ router.get("/", function (req, res, next) {
 router.get("/:id", MovieValidator.validateId, function (req, res) {
 	let obj = Movie.getElementById(req.params.id);
 	if (!obj) {
-		return res.json({ status: false, msg: "Tarefa não encontrada" });
+		return res.json({ status: false, msg: "Filmes não encontrado" });
 	}
 
 	return res.json({ status: true, movie: obj });
@@ -43,9 +45,10 @@ function validateToken(req, res, next) {
 router.post(
 	"/",
 	validateToken,
-	MovieValidator.validateNome,
+	MovieValidator.validateMovie,
 	function (req, res) {
-		res.json({ status: true, movie: Movie.new(req.body.nome) });
+		console.log("YO");
+		res.json({ status: true, movie: Movie.new(req.body) });
 	}
 );
 
@@ -53,13 +56,18 @@ router.put(
 	"/:id",
 	validateToken,
 	MovieValidator.validateId,
-	MovieValidator.validateNome,
+	MovieValidator.validateMovie,
 	function (req, res) {
-		let obj = Movie.update(req.params.id, req.body.nome);
+		let obj = Movie.update(
+			req.params.id,
+			req.body.name,
+			req.body.genres,
+			req.body.rating
+		);
 		if (!obj) {
 			return res.json({
 				status: false,
-				msg: "Falha ao alterar a tarefa",
+				msg: "Falha ao alterar o filme",
 			});
 		}
 
@@ -75,7 +83,7 @@ router.delete(
 		if (!Movie.delete(req.params.id)) {
 			return res.json({
 				status: false,
-				msg: "Falha ao excluir a tarefa",
+				msg: "Falha ao excluir o filme da lista",
 			});
 		}
 
