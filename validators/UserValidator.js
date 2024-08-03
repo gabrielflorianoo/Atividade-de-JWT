@@ -1,8 +1,18 @@
 const Joi = require("joi");
 
-const MovieSchema = Joi.object({
+const UserSchema = Joi.object({
 	id: Joi.number().integer().greater(0),
-	name: Joi.string().min(3).max(30).required(),
-	genres: Joi.array().items(Joi.string().min(3)).required(),
-	rating: Joi.number().less(10).not().negative().required(),
-}).with("id", "name", "genres", "rating");
+	username: Joi.string().min(3).max(30).required(),
+	password: Joi.string().min(3).max(30).required(),
+});
+
+module.exports = {
+	validateUser: function (req, res, next) {
+		const { error, value } = UserSchema.validate(req.body);
+		if (error) {
+			return res.json({ status: false, msg: "Dados incompletos" });
+		}
+		req.body = value;
+		return next();
+	},
+};
