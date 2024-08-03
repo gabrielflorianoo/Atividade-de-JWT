@@ -4,7 +4,7 @@ block content
   section.section
     div.container
       h1.title Registrar
-      form(action='/users/registrar' method='post')
+      form(id="register-form" action='/users/registrar' method='post')
         div.field
           label.label(for='username') Nome de Usuário
           div.control
@@ -18,3 +18,27 @@ block content
             button.button.is-primary(type='submit') Registrar
         p
           a(href='/users/logar') Logar
+      
+      script.
+        document.getElementById('register-form').onsubmit = async function (e) {
+          e.preventDefault();
+          const form = e.target;
+          const formData = new FormData(form);
+          const data = Object.fromEntries(formData.entries());
+          
+          const response = await fetch(form.action, {
+            method: form.method,
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+          });
+          
+          const result = await response.json();
+          if (result.status) {
+            localStorage.setItem('token', result.token);
+            window.location.href = '/';
+          } else {
+            alert('Registro falhou');
+          }
+        };

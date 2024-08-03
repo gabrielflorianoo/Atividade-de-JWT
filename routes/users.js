@@ -32,6 +32,7 @@ router.post(
 		let token = jwt.sign({ user: username }, "#Abcasdfqwr", {
 			expiresIn: "20 min",
 		});
+		
 		res.json({ status: true, token: token });
 	}
 );
@@ -47,6 +48,7 @@ router.post("/logar", UserValidator.validateUser, function (req, res, next) {
 		let token = jwt.sign({ user: username }, "#Abcasdfqwr", {
 			expiresIn: "20 min",
 		});
+
 		res.json({ status: true, token: token });
 	} else {
 		res.status(403).json({ status: false, msg: "Usuario/Senha invalidos" });

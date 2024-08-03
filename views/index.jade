@@ -1,10 +1,10 @@
-extends layout 
+extends layout
 
 block content
   section.section
     div.container
       h1.title API de Criação de Filmes
-      form(action='/movies' method='post')
+      form#movieForm(action='/movies' method='post')
         div.field
           label.label(for='name') Nome do Filme
           div.control
@@ -20,3 +20,93 @@ block content
         div.field
           div.control
             button.button.is-primary(type='submit') Criar Filme
+
+    section.section
+      div.container
+        h1.title Filmes da Lista
+        div#movies-list  // Contêiner para a lista de filmes
+
+    script.
+      // Função para obter o token do localStorage
+      function getToken() {
+        return localStorage.getItem('token');
+      }
+
+      // Função para fazer uma requisição com o token
+      async function fetchWithToken(url, options = {}) {
+        const token = getToken();
+        const headers = {
+          'Content-Type': 'application/json',
+          ...options.headers
+        };
+
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        const response = await fetch(url, {
+          ...options,
+          headers
+        });
+
+        return response.json();
+      }
+
+      // Função para buscar e exibir filmes
+      async function loadMovies() {
+        try {
+          const result = await fetchWithToken('/movies', { method: 'GET' });
+          const moviesList = document.getElementById('movies-list');
+
+          if (result.status) {
+            const movies = result.list || [];
+            moviesList.innerHTML = movies.map(movie => `
+              <div class="box">
+                <h2 class="title is-4">${movie.name}</h2>
+                <p><strong>Gêneros:</strong> ${movie.genres.join(', ')}</p>
+                <p><strong>Avaliação:</strong> ${movie.rating}</p>
+              </div>
+            `).join('');
+          } else {
+            moviesList.innerHTML = '<p>Não há filmes na lista.</p>';
+          }
+        } catch (error) {
+          console.error('Erro ao carregar filmes:', error);
+          document.getElementById('movies-list').innerHTML = '<p>Erro ao carregar filmes.</p>';
+        }
+      }
+
+      // Captura o envio do formulário
+      document.getElementById('movieForm').addEventListener('submit', async function (event) {
+        event.preventDefault(); // Impede o envio padrão do formulário
+
+        // Obtém os dados do formulário
+        const formData = new FormData(this);
+        const movie = {
+          name: formData.get('name'),
+          genres: formData.get('genres').split(',').map(g => g.trim()), // Converte a string de gêneros em um array
+          rating: parseFloat(formData.get('rating'))
+        };
+
+        try {
+          // Envia a requisição usando fetchWithToken
+          const result = await fetchWithToken('/movies', {
+            method: 'POST',
+            body: JSON.stringify(movie)
+          });
+
+          if (result.status) {
+            alert('Filme criado com sucesso!');
+            this.reset(); // Limpa o formulário
+            loadMovies(); // Recarrega a lista de filmes
+          } else {
+            alert('Erro ao criar filme: ' + result.msg);
+          }
+        } catch (error) {
+          console.error('Erro na requisição:', error);
+          alert('Erro na requisição');
+        }
+      });
+
+      // Carrega a lista de filmes ao carregar a página
+      document.addEventListener('DOMContentLoaded', loadMovies);

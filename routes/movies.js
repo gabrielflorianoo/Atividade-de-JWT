@@ -5,90 +5,108 @@ var MovieValidator = require("../validators/MovieValidator");
 var router = express.Router();
 
 router.get("/", function (req, res, next) {
-	if (Movie.list().length == 0) {
-		res.json({
-			status: true,
-			message: "Ainda não foram adicionados filmes a lista",
-		});
-	}
+    try {
+        const movies = Movie.list();
+        if (movies.length === 0) {
+            return res.json({
+                status: true,
+                message: "Ainda não foram adicionados filmes a lista",
+            });
+        }
 
-	res.json({ status: true, list: Movie.list() });
+        res.json({ status: true, list: movies });
+    } catch (error) {
+        next(error);
+    }
 });
 
-router.get("/:id", MovieValidator.validateId, function (req, res) {
-	let obj = Movie.getElementById(req.params.id);
-	if (!obj) {
-		return res.json({ status: false, msg: "Filmes não encontrado" });
-	}
+router.get("/:id", MovieValidator.validateId, function (req, res, next) {
+    try {
+        let obj = Movie.getElementById(req.params.id);
+        if (!obj) {
+            return res.json({ status: false, msg: "Filmes não encontrado" });
+        }
 
-	return res.json({ status: true, movie: obj });
+        res.json({ status: true, movie: obj });
+    } catch (error) {
+        next(error);
+    }
 });
 
 function validateToken(req, res, next) {
-	let token_full = req.headers["authorization"];
-	if (!token_full) token_full = "";
-	let token = token_full.split(": ")[1];
+    let token_full = req.headers["authorization"];
+    if (!token_full) token_full = "";
+    let token = token_full.split("")[1];
 
-	jwt.verify(token, "#Abcasdfqwr", (err, payload) => {
-		if (err) {
-			res.status(403).json({
-				status: false,
-				msg: "Acesso negado - Token invalido",
-			});
-			return;
-		}
-		req.user = payload.user;
-		next();
-	});
+    jwt.verify(token, "#Abcasdfqwr", (err, payload) => {
+        if (err) {
+            return res.status(403).json({
+                status: false,
+                msg: "Acesso negado - Token invalido",
+            });
+        }
+        req.user = payload.user;
+        next();
+    });
 }
 
 router.post(
-	"/",
-	validateToken,
-	MovieValidator.validateMovie,
-	function (req, res) {
-		console.log("YO");
-		res.json({ status: true, movie: Movie.new(req.body) });
-	}
+    "/",
+    validateToken,
+    MovieValidator.validateMovie,
+    function (req, res, next) {
+        try {
+            const movie = Movie.new(req.body);
+            if (!movie) {
+                return res.status(400).json({ status: false, msg: "Erro ao criar o filme" });
+            }
+
+            res.json({ status: true, movie });
+        } catch (error) {
+            next(error);
+        }
+    }
 );
 
 router.put(
-	"/:id",
-	validateToken,
-	MovieValidator.validateId,
-	MovieValidator.validateMovie,
-	function (req, res) {
-		let obj = Movie.update(
-			req.params.id,
-			req.body.name,
-			req.body.genres,
-			req.body.rating
-		);
-		if (!obj) {
-			return res.json({
-				status: false,
-				msg: "Falha ao alterar o filme",
-			});
-		}
+    "/:id",
+    validateToken,
+    MovieValidator.validateId,
+    MovieValidator.validateMovie,
+    function (req, res, next) {
+        try {
+            let obj = Movie.update(
+                req.params.id,
+                req.body.name,
+                req.body.genres,
+                req.body.rating
+            );
+            if (!obj) {
+                return res.status(400).json({ status: false, msg: "Falha ao alterar o filme" });
+            }
 
-		res.json({ status: true, movie: obj });
-	}
+            res.json({ status: true, movie: obj });
+        } catch (error) {
+            next(error);
+        }
+    }
 );
 
 router.delete(
-	"/:id",
-	validateToken,
-	MovieValidator.validateId,
-	function (req, res) {
-		if (!Movie.delete(req.params.id)) {
-			return res.json({
-				status: false,
-				msg: "Falha ao excluir o filme da lista",
-			});
-		}
+    "/:id",
+    validateToken,
+    MovieValidator.validateId,
+    function (req, res, next) {
+        try {
+            if (!Movie.delete(req.params.id)) {
+                return res.status(400).json({ status: false, msg: "Falha ao excluir o filme da lista" });
+            }
 
-		res.json({ status: true });
-	}
+            res.json({ status: true });
+        } catch (error) {
+            next(error);
+        }
+    }
 );
 
 module.exports = router;
