@@ -41,7 +41,7 @@ block content
         };
 
         if (token) {
-          headers['Authorization'] = `Bearer ${token}`;
+          headers['Authorization'] = `token: ${token}`;
         }
 
         const response = await fetch(url, {
@@ -60,11 +60,12 @@ block content
 
           if (result.status) {
             const movies = result.list || [];
+            console.log(movies);
             moviesList.innerHTML = movies.map(movie => `
               <div class="box">
-                <h2 class="title is-4">${movie.name}</h2>
-                <p><strong>Gêneros:</strong> ${movie.genres.join(', ')}</p>
-                <p><strong>Avaliação:</strong> ${movie.rating}</p>
+                <h2 class="title is-4">${movie.name.name}</h2>
+                <p><strong>Gêneros:</strong> ${movie.name.genres.join(', ')}</p>
+                <p><strong>Avaliação:</strong> ${movie.name.rating}</p>
               </div>
             `).join('');
           } else {
