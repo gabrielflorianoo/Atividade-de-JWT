@@ -2,10 +2,10 @@ const Joi = require("joi");
 
 const MovieSchema = Joi.object({
 	id: Joi.number().integer().greater(0),
-	nome: Joi.string().min(3).max(30).required(),
+	name: Joi.string().min(3).max(30).required(),
 	genres: Joi.array().items(Joi.string().min(3)).required(),
 	rating: Joi.number().less(10).not().negative().required(),
-}).with("id", "nome", "genres", "rating");
+}).with("id", "name", "genres", "rating");
 
 module.exports = {
 	validateId: function (req, res, next) {
