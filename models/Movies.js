@@ -2,11 +2,13 @@ let ids = 0;
 let movies = [];
 
 module.exports = {
+    // Create a new movie
     new(name, genres, rating) {
         let movie = {id: ids++, name: name, genres: genres, rating: rating};
         movies.push(movie);
         return task;
     },
+    // Update a movie
     update (id, name) {
         let pos = this.getPositionById(id)
         if (pos >= 0) {
@@ -15,9 +17,11 @@ module.exports = {
         }
         return null;
     },
+    // List all the movies
     list() {
         return movies;
     },
+    // Get a movie given an id
     getElementById(id) {
         let pos = this.getPositionById(id)
         if (pos >= 0) {
@@ -25,6 +29,7 @@ module.exports = {
         }
         return null;
     },
+    // Get the position of a movie given an id
     getPositionById(id) {
         for (let i = 0; i<movies.length; i++) {
             if (movies[i].id == id) {
@@ -33,6 +38,7 @@ module.exports = {
         }
         return -1;
     },
+    // Delete a movie from the movies list
     delete(id) {
         let i = this.getPositionById(id);
         if (i >= 0) {
