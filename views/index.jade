@@ -63,11 +63,15 @@ block content
             console.log(movies);
             moviesList.innerHTML = movies.map(movie => `
               <div class="box">
-                <h2 class="title is-4">${movie.name.name}</h2>
-                <p><strong>Gêneros:</strong> ${movie.name.genres.join(', ')}</p>
-                <p><strong>Avaliação:</strong> ${movie.name.rating}</p>
+                <h2 class="title is-4">${movie.name}</h2>
+                <p><strong>Gêneros:</strong> ${movie.genres.join(', ')}</p>
+                <p><strong>Avaliação:</strong> ${movie.rating}</p>
+                <div class="buttons">
+                  <button class="button is-primary edit-button" data-id="${movie.id}">Editar</button>
+                  <button class="button is-danger delete-button" data-id="${movie.id}">Excluir</button>
+                </div>
               </div>
-            `).join('');
+          ` ).join('');
           } else {
             moviesList.innerHTML = '<p>Não há filmes na lista.</p>';
           }
@@ -106,6 +110,69 @@ block content
         } catch (error) {
           console.error('Erro na requisição:', error);
           alert('Erro na requisição');
+        }
+      });
+
+      // Função para excluir um filme
+      async function deleteMovie(id) {
+        try {
+          const result = await fetchWithToken(`/movies/${id}`, {
+            method: 'DELETE'
+          });
+
+          if (result.status) {
+            alert('Filme excluído com sucesso!');
+            // Recarregar a lista de filmes após a exclusão
+            loadMovies();
+          } else {
+            alert('Erro ao excluir filme: ' + result.msg);
+          }
+        } catch (error) {
+          console.error('Erro na requisição:', error);
+          alert('Erro na requisição');
+        }
+      }
+
+      // Função para editar um filme
+      async function editMovie(id) {
+        // Exemplo simples de edição, você pode criar um formulário para edição
+        const name = prompt("Novo nome do filme:");
+        const genres = prompt("Novos gêneros (separados por vírgula):").split(',').map(g => g.trim());
+        const rating = parseFloat(prompt("Nova avaliação (0-10):"));
+
+        if (name && genres.length && !isNaN(rating)) {
+          try {
+            const result = await fetchWithToken(`/movies/${id}`, {
+              method: 'PUT',
+              body: JSON.stringify({ name, genres, rating })
+            });
+
+            if (result.status) {
+              alert('Filme atualizado com sucesso!');
+              // Recarregar a lista de filmes após a edição
+              loadMovies();
+            } else {
+              alert('Erro ao atualizar filme: ' + result.msg);
+            }
+          } catch (error) {
+            console.error('Erro na requisição:', error);
+            alert('Erro na requisição');
+          }
+        } else {
+          alert('Informações inválidas para edição');
+        }
+      }
+
+      // Adiciona event listeners para os botões de excluir e editar
+      document.addEventListener('click', function(event) {
+        if (event.target.classList.contains('delete-button')) {
+          const id = event.target.dataset.id;
+          deleteMovie(id);
+        }
+
+        if (event.target.classList.contains('edit-button')) {
+          const id = event.target.dataset.id;
+          editMovie(id);
         }
       });
 

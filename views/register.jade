@@ -18,14 +18,14 @@ block content
             button.button.is-primary(type='submit') Registrar
         p
           a(href='/users/logar') Logar
-      
+
       script.
         document.getElementById('register-form').onsubmit = async function (e) {
           e.preventDefault();
           const form = e.target;
           const formData = new FormData(form);
           const data = Object.fromEntries(formData.entries());
-          
+
           const response = await fetch(form.action, {
             method: form.method,
             headers: {
@@ -33,7 +33,7 @@ block content
             },
             body: JSON.stringify(data)
           });
-          
+
           const result = await response.json();
           if (result.status) {
             localStorage.setItem('token', result.token);

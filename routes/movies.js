@@ -10,7 +10,7 @@ router.get("/", function (req, res, next) {
         if (movies.length === 0) {
             return res.json({
                 status: true,
-                message: "Ainda não foram adicionados filmes a lista",
+                message: "Ainda não foram adicionados filmes à lista",
             });
         }
 
@@ -24,7 +24,7 @@ router.get("/:id", MovieValidator.validateId, function (req, res, next) {
     try {
         let obj = Movie.getElementById(req.params.id);
         if (!obj) {
-            return res.json({ status: false, msg: "Filmes não encontrado" });
+            return res.json({ status: false, msg: "Filme não encontrado" });
         }
 
         res.json({ status: true, movie: obj });
@@ -42,7 +42,7 @@ function validateToken(req, res, next) {
         if (err) {
             return res.status(403).json({
                 status: false,
-                msg: "Acesso negado - Token invalido",
+                msg: "Acesso negado - Token inválido",
             });
         }
         req.user = payload.user;
@@ -56,7 +56,8 @@ router.post(
     MovieValidator.validateMovie,
     function (req, res, next) {
         try {
-            const movie = Movie.new(req.body);
+            const { name, genres, rating } = req.body;
+            const movie = Movie.new(name, genres, rating);
             if (!movie) {
                 return res.status(400).json({ status: false, msg: "Erro ao criar o filme" });
             }
@@ -75,11 +76,12 @@ router.put(
     MovieValidator.validateMovie,
     function (req, res, next) {
         try {
+            const { name, genres, rating } = req.body;
             let obj = Movie.update(
                 req.params.id,
-                req.body.name,
-                req.body.genres,
-                req.body.rating
+                name,
+                genres,
+                rating
             );
             if (!obj) {
                 return res.status(400).json({ status: false, msg: "Falha ao alterar o filme" });
