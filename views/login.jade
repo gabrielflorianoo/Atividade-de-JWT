@@ -1,0 +1,20 @@
+extends layout
+
+block content
+  section.section
+    div.container
+      h1.title Login
+      form(action='/users/logar' method='post')
+        div.field
+          label.label(for='username') Nome de Usuário
+          div.control
+            input.input(type='text' id='username' name='username' placeholder='Nome de Usuário' required)
+        div.field
+          label.label(for='password') Senha
+          div.control
+            input.input(type='password' id='password' name='password' placeholder='Senha' required)
+        div.field
+          div.control
+            button.button.is-primary(type='submit') Logar
+      p
+        a(href='/users/registrar') Registrar

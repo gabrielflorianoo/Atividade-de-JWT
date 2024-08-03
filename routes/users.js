@@ -5,7 +5,13 @@ var UserValidator = require("../validators/UserValidator");
 
 var users = [];
 
-router.get("/", function (req, res, next) {});
+router.get("/login", function (req, res, next) {
+	res.render("login");
+});
+
+router.get("/registrar", function (req, res, next) {
+	res.render("register");
+});
 
 router.post(
 	"/registrar",

@@ -1,0 +1,22 @@
+extends layout 
+
+block content
+  section.section
+    div.container
+      h1.title API de Criação de Filmes
+      form(action='/movies' method='post')
+        div.field
+          label.label(for='name') Nome do Filme
+          div.control
+            input.input(type='text' id='name' name='name' placeholder='Nome do Filme' required)
+        div.field
+          label.label(for='genres') Gêneros
+          div.control
+            input.input(type='text' id='genres' name='genres' placeholder='Gêneros separados por vírgula' required)
+        div.field
+          label.label(for='rating') Avaliação
+          div.control
+            input.input(type='number' id='rating' name='rating' placeholder='Avaliação (0-10)' step='0.1' min='0' max='10' required)
+        div.field
+          div.control
+            button.button.is-primary(type='submit') Criar Filme

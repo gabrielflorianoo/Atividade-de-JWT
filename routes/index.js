@@ -6,7 +6,7 @@ var router = express.Router();
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
-	res.status(200).send("Nothing to do here");
+	res.render('index');
 });
 
 module.exports = router;
